@@ -10,69 +10,149 @@ using Microsoft.TeamFoundation.Common;
 
 namespace ComplianceTool.Common.Interfaces
 {
-    public interface IFileInfoProxy
+    public interface IProxy<out TClientType>
+    {
+        TClientType Client { get; }
+    }
+
+    public interface IFileInfoProxy : IProxy<FileInfo>
     {
         IDirectoryInfoProxy Directory { get; }
+
         string DirectoryName { get; }
+
         bool Exists { get; }
+
         bool IsReadOnly { get; }
+
         string Name { get; }
+
         string FullName { get; }
+
+        DateTime CreationTime { get; }
+
+        string Extension { get; }
+
+        FileAttributes Attributes { get; set; }
+
         IFileStreamProxy Create();
+
         IStreamWriterProxy CreateText();
+
         IStreamWriterProxy AppendText();
+
+        void CopyTo(string destFileName);
+
+        void CopyTo(string destFileName, bool overwrite);
+
+        IFileStreamProxy Open(FileMode mode);
+
+        IFileStreamProxy Open(FileMode mode, FileAccess access);
+
+        IFileStreamProxy Open(FileMode mode, FileAccess access, FileShare share);
     }
 
     public class FileInfoProxy : IFileInfoProxy
     {
-        private FileInfo _instance;
+        public static FileInfoProxy Representing(FileInfo instance)
+        {
+            return new FileInfoProxy(instance);
+        }
 
         public FileInfoProxy(string fullName)
         {
-            _instance = new FileInfo(fullName);
+            Client = new FileInfo(fullName);
         }
 
-        public IDirectoryInfoProxy Directory => DirectoryInfoProxy.Representing(_instance.Directory);
-        public string DirectoryName => _instance.DirectoryName;
-        public bool Exists => _instance.Exists;
-        public bool IsReadOnly => _instance.IsReadOnly;
-        public string Name => _instance.Name;
-        public string FullName => _instance.FullName;
+        private FileInfoProxy(FileInfo instance)
+        {
+            Client = instance;
+        }
+
+        public IDirectoryInfoProxy Directory => DirectoryInfoProxy.Representing(Client.Directory);
+
+        public string DirectoryName => Client.DirectoryName;
+
+        public bool Exists => Client.Exists;
+
+        public bool IsReadOnly => Client.IsReadOnly;
+
+        public string Name => Client.Name;
+
+        public string FullName => Client.FullName;
+
+        public DateTime CreationTime => Client.CreationTime;
+
+        public string Extension => Client.Extension;
+
+        public FileInfo Client { get; }
+
+        public FileAttributes Attributes
+        {
+            get => Client.Attributes;
+            set => Client.Attributes = value;
+        }
 
         public IFileStreamProxy Create()
         {
-            return FileStreamProxy.Representing(_instance.Create());
+            return FileStreamProxy.Representing(Client.Create());
         }
 
         public IStreamWriterProxy CreateText()
         {
-            return StreamWriterProxy.Representing(_instance.CreateText());
+            return StreamWriterProxy.Representing(Client.CreateText());
         }
 
         public IStreamWriterProxy AppendText()
         {
-            return StreamWriterProxy.Representing(_instance.AppendText());
+            return StreamWriterProxy.Representing(Client.AppendText());
         }
 
+        public void CopyTo(string destFileName)
+        {
+            Client.CopyTo(destFileName);
+        }
+
+        public void CopyTo(string destFileName, bool overwrite)
+        {
+            Client.CopyTo(destFileName, overwrite);
+        }
+
+        public IFileStreamProxy Open(FileMode mode)
+        {
+            return FileStreamProxy.Representing(Client.Open(mode));
+        }
+
+        public IFileStreamProxy Open(FileMode mode, FileAccess access)
+        {
+            return FileStreamProxy.Representing(Client.Open(mode, access));
+        }
+
+        public IFileStreamProxy Open(FileMode mode, FileAccess access, FileShare share)
+        {
+            return FileStreamProxy.Representing(Client.Open(mode, access, share));
+        }
     }
 
-    public interface IDirectoryInfoProxy
+    public interface IDirectoryInfoProxy : IProxy<DirectoryInfo>
     {
         bool Exists { get; }
+
         string FullName { get; }
+
         string Name { get; }
+
         IDirectoryInfoProxy Parent { get; }
+
         IDirectoryInfoProxy Root { get; }
+
         void Create();
+
         void Create(DirectorySecurity directorySecurity);
     }
 
     public class DirectoryInfoProxy : IDirectoryInfoProxy
     {
-        private bool _dirExists;
-        private StreamWriter _streamWriter;
-        private DirectoryInfo _instance;
-
         public static IDirectoryInfoProxy Representing(DirectoryInfo instance)
         {
             return new DirectoryInfoProxy(instance);
@@ -80,40 +160,74 @@ namespace ComplianceTool.Common.Interfaces
 
         public DirectoryInfoProxy(string path)
         {
-            _instance = new DirectoryInfo(path);
+            Client = new DirectoryInfo(path);
         }
 
         private DirectoryInfoProxy(DirectoryInfo instance)
         {
-            _instance = instance ?? throw new ArgumentNullException(nameof(instance));
+            Client = instance ?? throw new ArgumentNullException(nameof(instance));
         }
 
-        public bool Exists => _instance.Exists;
-        public string FullName => _instance.FullName;
-        public string Name => _instance.Name;
-        public IDirectoryInfoProxy Parent => new DirectoryInfoProxy(_instance.Parent);
-        public IDirectoryInfoProxy Root => new DirectoryInfoProxy(_instance.Root);
+        public bool Exists => Client.Exists;
+
+        public string FullName => Client.FullName;
+
+        public string Name => Client.Name;
+
+        public IDirectoryInfoProxy Parent => new DirectoryInfoProxy(Client.Parent);
+
+        public IDirectoryInfoProxy Root => new DirectoryInfoProxy(Client.Root);
+
+        public DirectoryInfo Client { get; }
 
         public void Create()
         {
-            _instance.Create();
+            Client.Create();
         }
 
         public void Create(DirectorySecurity directorySecurity)
         {
-            _instance.Create(directorySecurity);
+            Client.Create(directorySecurity);
         }
     }
 
-    public interface IStreamWriterProxy
+    public interface IStreamWriterProxy : IProxy<StreamWriter>
     {
+        string NewLine { get; }
 
+        Encoding Encoding { get; }
+
+        IStreamProxy BaseStream { get; }
+
+        bool AutoFlush { get; set; }
+
+        void Close();
+
+        void Flush();
+
+        void Write(char[] buffer, int index, int count);
+
+        void Write(double value);
+
+        void Write(char[] value);
+
+        void Write(bool value);
+
+        void Write(char value);
+
+        void WriteLine();
+
+        void WriteLine(bool value);
+
+        void WriteLine(char value);
+
+        void WriteLine(char[] value);
+
+        void WriteLine(char[] buffer, int index, int count);
     }
 
     public class StreamWriterProxy : IStreamWriterProxy, IDisposable
     {
-        private StreamWriter _instance;
-
         public static IStreamWriterProxy Representing(StreamWriter instance)
         {
             return new StreamWriterProxy(instance);
@@ -121,37 +235,125 @@ namespace ComplianceTool.Common.Interfaces
 
         public StreamWriterProxy(string path)
         {
-            _instance = new StreamWriter(path);
+            Client = new StreamWriter(path);
         }
 
         private StreamWriterProxy(StreamWriter instance)
         {
-            _instance = instance;
-            instance.
+            Client = instance;
         }
+
+        public string NewLine => Client.NewLine;
+
+        public Encoding Encoding => Client.Encoding;
+
+        public IStreamProxy BaseStream => StreamProxy.Representing(Client.BaseStream);
+        
+        public void Close()
+        {
+            Client.Close();
+        }
+
+        public void Flush()
+        {
+            Client.Flush();
+        }
+
+        public void Write(char[] buffer, int index, int count)
+        {
+            Client.Write(buffer, index, count);
+        }
+
+        public void Write(double value)
+        {
+            Client.Write(value);
+        }
+
+        public void Write(char[] value)
+        {
+            Client.Write(value);
+        }
+
+        public void Write(bool value)
+        {
+            Client.Write(value);
+        }
+
+        public void Write(char value)
+        {
+            Client.Write(value);
+        }
+
+        public void WriteLine()
+        {
+            Client.WriteLine();
+        }
+
+        public void WriteLine(bool value)
+        {
+            Client.WriteLine(value);
+        }
+
+        public void WriteLine(char value)
+        {
+            Client.WriteLine(value);
+        }
+
+        public void WriteLine(char[] value)
+        {
+            Client.WriteLine(value);
+        }
+
+        public void WriteLine(char[] buffer, int index, int count)
+        {
+            Client.WriteLine(buffer, index, count);
+        }
+
+        public StreamWriter Client { get; }
 
         public bool AutoFlush
         {
-            get => _instance.AutoFlush;
-            set => _instance.AutoFlush = value;
+            get => Client.AutoFlush;
+            set => Client.AutoFlush = value;
+        }
+
+        private bool _disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed || !disposing)
+            {
+                return;
+            }
+
+            Client?.Dispose();
+            _disposed = true;
         }
 
         public void Dispose()
         {
-            _instance?.Dispose();
+            Dispose(true);
         }
     }
 
-    public interface IFileStreamProxy
+    public interface IFileStreamProxy : IProxy<FileStream>
     {
-        
-        void Dispose();
+        string Name { get; }
+
+        bool IsAsync { get; }
+
+        ISafeFileHandleProxy SafeFileHandle { get; }
+
+        IFileSecurityProxy GetAccessControl();
+
+        void Lock(long position, long length);
+
+        void SetAccessControl(IFileSecurityProxy fileSecurity);
+
+        void Unlock(long position, long length);
     }
 
     public class FileStreamProxy : StreamProxy, IFileStreamProxy
     {
-        private FileStream _instance;
-
         public static IFileStreamProxy Representing(FileStream instance)
         {
             return new FileStreamProxy(instance);
@@ -166,41 +368,187 @@ namespace ComplianceTool.Common.Interfaces
         private FileStreamProxy(FileStream instance)
             : base(instance)
         {
-            //instance.IsAsync;
-            //instance.SafeFileHandle;
-            //instance.GetAccessControl();
-            //instance.Lock();
-            //instance.SetAccessControl();
-            //instance.Unlock();
-
-            _instance = instance;
+            Client = instance;
         }
 
-        public string Name => _instance.Name;
+        public string Name => Client.Name;
+
+        public bool IsAsync => Client.IsAsync;
+
+        public FileStream Client { get; }
+
+        public ISafeFileHandleProxy SafeFileHandle => SafeFileHandleProxy.Representing(Client.SafeFileHandle);
+
+        public IFileSecurityProxy GetAccessControl()
+        {
+            return FileSecurityProxy.Representing(Client.GetAccessControl());
+        }
+
+        public void Lock(long position, long length)
+        {
+            Client.Lock(position, length);
+        }
+
+        public void SetAccessControl(IFileSecurityProxy fileSecurity)
+        {
+            Client.SetAccessControl(fileSecurity.Client);
+        }
+        
+        public void Unlock(long position, long length)
+        {
+            Client.Unlock(position, length);
+        }
+        
+        public override void CopyTo(IStreamProxy streamProxy)
+        {
+            if (streamProxy is IProxy<FileStream> proxy)
+            {
+                Client.CopyTo(proxy.Client);
+            }
+
+            var interfaceName = typeof(IStreamProxy).Name;
+            var className = GetType().Name;
+            throw new ArgumentException($"This method is executing on a {className} implementation of the {interfaceName} interface." +
+                                        $"For this implementation the argument object implementing {interfaceName} " +
+                                        $"must be able to take the shape of (via casting, can be explicitly converted to) {className}.");
+        }
+    }
+
+    public interface IFileSecurityProxy : IProxy<FileSecurity>
+    {
+
+    }
+
+    public class FileSecurityProxy : IFileSecurityProxy
+    {
+        public static FileSecurityProxy Representing(FileSecurity instance)
+        {
+            return new FileSecurityProxy(instance);
+        }
+
+        public FileSecurityProxy()
+        {
+            Client = new FileSecurity();
+        }
+
+        public FileSecurityProxy(string fileName, AccessControlSections includeSections)
+        {
+            Client = new FileSecurity(fileName, includeSections);
+        }
+        
+        private FileSecurityProxy(FileSecurity instance)
+        {
+            Client = instance;
+        }
+
+        public FileSecurity Client { get; }
+    }
+
+    public interface ISafeFileHandleProxy : IProxy<SafeFileHandle>
+    {
+        bool IsInvalid { get; }
+
+        bool IsClosed { get; }
+
+        void Close();
+
+        void DangerousAddRef(ref bool success);
+
+        void DangerousGetHandle();
+
+        void DangerousRelease();
+
+        void SetHandleAsInvalid();
+
+    }
+
+    public class SafeFileHandleProxy : ISafeFileHandleProxy, IDisposable
+    {
+        public static SafeFileHandleProxy Representing(SafeFileHandle instance)
+        {
+            return new SafeFileHandleProxy(instance);
+        }
+
+        public void Dispose()
+        {
+            Client.Dispose();
+        }
+
+        public SafeFileHandleProxy(IntPtr preexistingHandle, bool ownsHandle)
+        {
+            Client = new SafeFileHandle(preexistingHandle, ownsHandle);
+        }
+
+        private SafeFileHandleProxy(SafeFileHandle instance)
+        {
+            Client = instance;
+        }
+
+        public bool IsInvalid => Client.IsInvalid;
+
+        public bool IsClosed => Client.IsClosed;
+
+        public SafeFileHandle Client { get; }
+
+        public void Close()
+        {
+            Client.Close();
+        }
+
+        public void DangerousAddRef(ref bool success)
+        {
+            Client.DangerousAddRef(ref success);
+        }
+
+        public void DangerousGetHandle()
+        {
+            Client.DangerousGetHandle();
+        }
+
+        public void DangerousRelease()
+        {
+            Client.DangerousRelease();
+        }
+
+        public void SetHandleAsInvalid()
+        {
+            Client.SetHandleAsInvalid();
+        }
     }
 
     public interface IStreamProxy
     {
         bool CanRead { get; }
+
         bool CanWrite { get; }
+
         bool CanSeek { get; }
+
         long Length { get; }
+
         bool CanTimeout { get; }
+
         long Position { get; }
+
         int ReadTimeout { get; }
+
         int WriteTimeout { get; }
+
         void Flush();
+
         int Read(byte[] buffer, int offset, int count);
+
         void Write(byte[] buffer, int offset, int count);
+
         long Seek(long offset, SeekOrigin origin);
+
         void Close();
+
         void CopyTo(IStreamProxy streamProxy);
     }
 
-    public class StreamProxy : IStreamProxy, IDisposable
+    public class StreamProxy : IStreamProxy, IProxy<Stream>, IDisposable
     {
-        private Stream _instance;
-
         public static IStreamProxy Representing(Stream instance)
         {
             return new StreamProxy(instance);
@@ -212,14 +560,22 @@ namespace ComplianceTool.Common.Interfaces
         }
         
         public bool CanRead => _instance.CanRead;
+
         public bool CanWrite => _instance.CanWrite;
+
         public bool CanSeek => _instance.CanSeek;
+
         public long Length => _instance.Length;
+
         public bool CanTimeout => _instance.CanTimeout;
+
         public long Position => _instance.Position;
+
         public int ReadTimeout => _instance.ReadTimeout;
+
         public int WriteTimeout => _instance.WriteTimeout;
 
+        Stream IProxy<Stream>.Client => _instance;
 
         public virtual void Flush()
         {
@@ -248,9 +604,9 @@ namespace ComplianceTool.Common.Interfaces
 
         public virtual void CopyTo(IStreamProxy streamProxy)
         {
-            if (streamProxy is StreamProxy proxy)
+            if (streamProxy is IProxy<Stream> proxy)
             {
-                _instance.CopyTo(proxy._instance);    
+                _instance.CopyTo(proxy.Client);    
             }
 
             var interfaceName = typeof(IStreamProxy).Name;
@@ -262,6 +618,7 @@ namespace ComplianceTool.Common.Interfaces
 
         #region IDisposable Support
         private bool _disposed = false; // To detect redundant calls
+        private Stream _instance;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -274,38 +631,11 @@ namespace ComplianceTool.Common.Interfaces
             _instance = null;
             _disposed = true;
         }
-
+        
         public void Dispose()
         {
             Dispose(true);
         }
         #endregion
-    }
-
-    public class Writer
-    {
-
-        public void WriteFile(string name, string path, string contents)
-        {
-            if (!_dirExists)
-            {
-                throw new InvalidOperationException("The path given has not been validated or is invalid");
-            }
-        }
-
-        public void WriteFile(string name, string path, Stream contents)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void ValidateDirectory(string path)
-        {
-
-        }
-
-        public void Dispose()
-        {
-            _streamWriter?.Dispose();
-        }
     }
 }
