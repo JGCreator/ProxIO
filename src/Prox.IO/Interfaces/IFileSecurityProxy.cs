@@ -1,6 +1,6 @@
 ﻿using System.Security.AccessControl;
 
-namespace ProxIO.Interfaces
+namespace Prox.IO.Interfaces
 {
     public interface IFileSecurityProxy : IProxy<FileSecurity>
     {

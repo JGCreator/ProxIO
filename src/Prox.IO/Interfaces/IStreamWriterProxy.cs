@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace ProxIO.Interfaces
+namespace Prox.IO.Interfaces
 {
     public interface IStreamWriterProxy : IProxy<StreamWriter>, IDisposable
     {

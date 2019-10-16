@@ -1,8 +1,8 @@
 ﻿using System;
-using ProxIO.Interfaces;
+using Prox.IO.Interfaces;
 using Microsoft.Win32.SafeHandles;
 
-namespace ProxIO
+namespace Prox.IO
 {
     public class SafeFileHandleProxy : ISafeFileHandleProxy, IDisposable
     {

@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using ProxIO.Interfaces;
+using Prox.IO.Interfaces;
 
-namespace ProxIO
+namespace Prox.IO
 {
     public class StreamProxy : IStreamProxy
     {

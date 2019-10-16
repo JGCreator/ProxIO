@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32.SafeHandles;
 
-namespace ProxIO.Interfaces
+namespace Prox.IO.Interfaces
 {
     public interface ISafeFileHandleProxy : IProxy<SafeFileHandle>
     {

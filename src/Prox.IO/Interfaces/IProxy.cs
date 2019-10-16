@@ -1,4 +1,4 @@
-﻿namespace ProxIO.Interfaces
+﻿namespace Prox.IO.Interfaces
 {
     public interface IProxy<out TClientType>
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace ProxIO.Interfaces
+namespace Prox.IO.Interfaces
 {
     public interface IFileStreamProxy : IProxy<FileStream>, IDisposable
     {
