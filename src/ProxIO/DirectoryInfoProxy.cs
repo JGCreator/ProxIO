@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Security.AccessControl;
-using ComplianceTool.Common.Interfaces;
-using ComplianceTool.Common.ProxIO.Interfaces;
+using ProxIO.Interfaces;
 
-namespace ComplianceTool.Common.ProxIO
+namespace ProxIO
 {
     public class DirectoryInfoProxy : IDirectoryInfoProxy
     {
@@ -41,8 +40,9 @@ namespace ComplianceTool.Common.ProxIO
         }
 
         public void Create(DirectorySecurity directorySecurity)
-        {
-            Client.Create(directorySecurity);
-        }
+        {            
+            Client.Create();
+            Client.SetAccessControl(directorySecurity);
+        }        
     }
 }

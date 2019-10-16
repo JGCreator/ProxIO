@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Security.AccessControl;
 
-namespace ComplianceTool.Common.ProxIO.Interfaces
+namespace ProxIO.Interfaces
 {
     public interface IDirectoryInfoProxy : IProxy<DirectoryInfo>
     {

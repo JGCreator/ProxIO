@@ -1,4 +1,4 @@
-﻿namespace ComplianceTool.Common.ProxIO.Interfaces
+﻿namespace ProxIO.Interfaces
 {
     public interface IProxy<out TClientType>
     {

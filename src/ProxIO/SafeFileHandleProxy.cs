@@ -1,8 +1,8 @@
 ﻿using System;
-using ComplianceTool.Common.ProxIO.Interfaces;
+using ProxIO.Interfaces;
 using Microsoft.Win32.SafeHandles;
 
-namespace ComplianceTool.Common.ProxIO
+namespace ProxIO
 {
     public class SafeFileHandleProxy : ISafeFileHandleProxy, IDisposable
     {

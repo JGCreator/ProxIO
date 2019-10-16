@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Text;
-using ComplianceTool.Common.ProxIO.Interfaces;
+using ProxIO.Interfaces;
 
-namespace ComplianceTool.Common.ProxIO
+namespace ProxIO
 {
     public class StreamWriterProxy : IStreamWriterProxy
     {

@@ -1,9 +1,9 @@
 ﻿using System.Security.AccessControl;
 
-namespace ComplianceTool.Common.ProxIO.Interfaces
+namespace ProxIO.Interfaces
 {
     public interface IFileSecurityProxy : IProxy<FileSecurity>
     {
-
+        
     }
 }

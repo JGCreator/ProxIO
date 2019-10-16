@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace ComplianceTool.Common.ProxIO.Interfaces
+namespace ProxIO.Interfaces
 {
     public interface IStreamWriterProxy : IProxy<StreamWriter>, IDisposable
     {

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using ComplianceTool.Common.Interfaces;
-using ComplianceTool.Common.ProxIO.Interfaces;
+using ProxIO.Interfaces;
 
-namespace ComplianceTool.Common.ProxIO
+namespace ProxIO
 {
     public class FileInfoProxy : IFileInfoProxy
     {
