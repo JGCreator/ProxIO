@@ -4,7 +4,7 @@ A .Net Standard library wrapping System.IO classes in interfaces and proxy class
 Some method overloads present in the full framework libraries are found here, but it should be assumed that types will follow the .Net Core api for accessing the filesystem.
 
 ## The struggle is real
-The need to write files exists, and unfortunately that code can sometimes be more complex than you might be comfortable with, given that much of the file system api has been centered around easy to use, hard to test **static** methods (ie. `File.Create("c:/readme.md")`). If you aren't a fan of using Static Ave. to access the file system, there are non-static classes the offer the same functionality.
+The need to write files exists, and unfortunately that code can sometimes be more complex than you might be comfortable with, given that much of the file system api has been centered around easy to use, hard to test **static** methods (ie. `File.Create("c:/readme.md")`). If you aren't a fan of using Static Ave. to access the file system, there are non-static classes offering the same functionality.
 
 `File.Create("c:/readme.md");` = `new FileInfo("c:/readme.md").Create()`
 
